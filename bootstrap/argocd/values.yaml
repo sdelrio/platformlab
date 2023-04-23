@@ -1,0 +1,118 @@
+argo-cd:
+  global:
+    deploymentAnnotations:
+      reloader.stakater.com/auto: "true"
+    statefulsetAnnotations:
+      reloader.stakater.com/auto: "true"
+
+  configs:
+  ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
+    cm:
+      # The exec resource allows a user to exec into Pods via the Argo CD UI
+      exec.enabled: 'true'  ## Ref: https://argo-cd.readthedocs.io/en/latest/operator-manual/rbac/#exec-resource
+      statusbadge.enabled: 'true'
+      url: https://*host
+      kustomize.buildOptions: --enable-helm
+      resource.customizations.health.argoproj.io_Application: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = ""
+        if obj.status ~= nil then
+          if obj.status.health ~= nil then
+            hs.status = obj.status.health.status
+            if obj.status.health.message ~= nil then
+              hs.message = obj.status.health.message
+            end
+          end
+        end
+        return hs
+      timeout.reconciliation: 0s
+  server:
+    logFormat: text  ## log format: text|json
+    logLevel: warning  ## log level
+
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPUUtilizationiPercentage: 60
+      targetMemoryUtilizationPercentage: 80
+
+    resources:
+      limits:
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    metric:
+      enabled: true
+      serviceMonitor:
+        enabled: false  # Disabled until a Prometheus is installed in cluster
+        selector:
+          release: monitoring
+
+    # Certificate config
+    certificate:
+      enabled: false
+
+    extraArgs:
+      - --insecure
+    ingress:
+      enabled: true
+      #ingressClassName: nginx-internal
+      hosts:
+        - &host argocd.127.0.0.1.nip.io
+      tls:
+        - hosts:
+            - *host
+
+    metrics: &metrics
+      enabled: false
+      serviceMonitor:
+        enabled: false  # Disabled until a Prometheus is installed in cluster
+  dex:
+    enabled: false
+  controller:
+    metrics: *metrics
+    logFormat: text
+    logLevel: warning
+    enableStatefulSet: true
+    resources:
+      limits:
+        memory: 1024Mi
+      requests:
+        cpu: 400m
+        memory: 512Mi
+    args:
+      operationProcessors: "50"
+      appResyncPeriod: "360"
+    extraArgs:
+      - "--repo-server-timeout-seconds"
+      - "210"
+
+  repoServer:
+    metrics: *metrics
+    logFormat: text
+    logLevel: warning
+
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPUUtilizationPercentage: 200
+      targetMemoryUtilizationPercentage: 80
+    resources:
+      limits:
+        memory: 336Mi
+      requests:
+        cpu: 400m
+        memory: 128Mi
+  redis:
+    metrics: *metrics
+    resources:
+      limits:
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi

@@ -1,0 +1,27 @@
+gitea:
+  ingress:
+    enabled: true
+   #className: nginx
+    hosts:
+      - host: &host git.127.0.0.1.nip.io
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - *host
+  gitea:
+    admin:
+      username: devops
+      password: devops
+    config:
+      server:
+        LANDING_PAGE: explore
+        ROOT_URL: https://git.127.0.0.1.nip.io
+      webhook:
+        ALLOWED_HOST_LIST: private
+  persistence:
+    storageClass: local-path
+  postgresql:
+    persistence:
+      storageClass: local-path
