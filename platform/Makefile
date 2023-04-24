@@ -1,5 +1,7 @@
 default: namespace gitea
 
+SHELL:=/bin/bash
+
 GITEA_DOMAIN := git.127.0.0.1.nip.io
 GITEA_URL := https://$(GITEA_DOMAIN)
 GITEA_API := $(GITEA_URL)/api/v1
@@ -33,6 +35,8 @@ gitea: namespace gitea/charts
 				| kubectl -n gitea apply -f - 
 	@echo "[info] wait for gitea pods to be ready ..."
 	@kubectl wait pods -n gitea -l app=gitea --for condition=Ready --timeout=120s
+	@echo "[info] wait for gitea ingress $(GITEA_URL) to be ready ..."
+	@while [[ "`curl -L -sk -o /dev/null -w ''%{http_code}'' $(GITEA_URL)`" != "200" ]]; do sleep 1; echo -n "." ; done
 
 gitea/token:  # https://docs.gitea.io/en-us/api-usage/#generating-and-listing-api-tokens
 	@echo "Generating token"
@@ -73,7 +77,7 @@ gitea/repo:
 		--data '{"name":"$(GITOPS_REPO)"}' 
 
 gitea/remote:
-	@if git remote -v | grep -q $(GITEA_URL); then \
+	@if git remote -v | grep -q $(GITEA_DOMAIN); then \
 		echo "already configured local git"; \
 	else \
 		echo "configuring $(GITEA_URL)"; \
