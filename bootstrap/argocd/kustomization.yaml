@@ -4,7 +4,7 @@ kind: Kustomization
 helmCharts:  # https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/helmcharts/ 
 - name: argo-cd
   repo: https://argoproj.github.io/argo-helm
-  version: 5.29.1
+  version: 5.36.11
   releaseName: argocd
   namespace: argocd
   includeCRDs: true
