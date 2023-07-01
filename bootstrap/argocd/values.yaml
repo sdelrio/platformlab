@@ -5,6 +5,15 @@ global:
     reloader.stakater.com/auto: "true"
 
 configs:
+  secret:
+    createSecret: true
+    # Argo expects the password in the secret to be bcrypt hashed. You can create this hash with
+    # htpasswd -nbBC 10 "" $ARGO_PWD | tr -d ':\n' | sed 's/$2y/$2a/'
+    # https://www.browserling.com/tools/bcrypt
+    # https://helm.sh/docs/chart_template_guide/function_list/
+    argocdServerAdminPassword: "$2a$10$gALzZhteBmxeztRTz9XkLO7qHRJ2zZE7EEUOlS8BjgrrXhMxxuq6a"
+    # Password modification time defaults to current time if not set, and token wont work if current date before that
+    argocdServerAdminPasswordMtime: "2023-07-01T01:00:00Z"
 ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cm.yaml
   cm:
     # The exec resource allows a user to exec into Pods via the Argo CD UI

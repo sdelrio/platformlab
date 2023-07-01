@@ -18,8 +18,8 @@ delete:
 			| kubectl delete -f -
 
 access:
-	@echo -n 'ArgoCD admin: '
-	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+	@echo -n 'ArgoCD admin: admin'
+	#@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 
 .PHONY: root
 root:
