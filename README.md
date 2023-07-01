@@ -28,3 +28,8 @@ Create namespace and install gitea. After wating for the pods to be ready:
 * Create `platform` repo inside `ops` organization.
 * `git push -u local` current local repo.
 
+## /mkcert
+
+* Creates self-signed cert
+* Install cert on Ingress
+
