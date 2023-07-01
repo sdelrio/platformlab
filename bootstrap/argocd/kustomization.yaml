@@ -19,7 +19,3 @@ patches:
   target:
     kind: ConfigMap
     name: argocd-cm
-- path: patches/argocd-lovely-plugin.yaml
-  target:
-    kind: Deployment
-    name: argocd-repo-server
