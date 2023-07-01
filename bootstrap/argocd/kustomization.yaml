@@ -7,7 +7,7 @@ helmCharts:  # https://kubectl.docs.kubernetes.io/references/kustomize/kustomiza
   version: 5.36.11
   releaseName: argocd
   namespace: argocd
-  includeCRDs: true
+  includeCRDs: true  # https://kubectl.docs.kubernetes.io/references/kustomize/builtins/#_helmchartinflationgenerator_
   valuesFile: values.yaml
 
   # skipTests: true
