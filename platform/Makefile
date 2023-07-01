@@ -6,7 +6,7 @@ GITEA_DOMAIN := git.127.0.0.1.nip.io
 GITEA_URL := https://$(GITEA_DOMAIN)
 GITEA_API := $(GITEA_URL)/api/v1
 TMP_TOKEN := /tmp/token.json
-TOKEN_NAME := test
+TOKEN_NAME := makefile-token
 
 GITOPS_ORG := ops
 GITOPS_REPO := platform
@@ -43,7 +43,8 @@ gitea/token:  # https://docs.gitea.io/en-us/api-usage/#generating-and-listing-ap
 	@[ ! -f $(TMP_TOKEN) ] && \
 		curl -k -s \
 		-H "Content-Type: application/json" \
-		-d '{"name":"$(TOKEN_NAME)"}' \
+		-X POST \
+		-d '{"name":"$(TOKEN_NAME)", "scopes":["sudo","admin:org"]}' \
 		-u $(GITOPS_USER):$(GITOPS_PASS) \
 		$(GITEA_API)/users/$(GITOPS_USER)/tokens > $(TMP_TOKEN) \
 		|| echo "$(TMP_TOKEN) already existed"
@@ -59,7 +60,7 @@ gitea/tokendelete:  # https://docs.gitea.io/en-us/api-usage/#generating-and-list
 
 gitea/org:
 	@echo "Creating gitea organization: $(GITOPS_ORG)"
-	curl -k -X POST "$(GITEA_API)/admin/users/$(GITOPS_USER)/orgs" \
+	@curl -k -X POST "$(GITEA_API)/admin/users/$(GITOPS_USER)/orgs" \
 		-H "Authorization: token $(shell cat $(TMP_TOKEN) | jq -r .sha1)" \
 		-H "Content-Type: application/json" \
 		-H "accept: application/json" \
