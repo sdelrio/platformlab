@@ -20,8 +20,11 @@ gitea:
         ROOT_URL: https://git.127.0.0.1.nip.io
       webhook:
         ALLOWED_HOST_LIST: private
+#  global:
+#    storageClass: local-path
   persistence:
     storageClass: local-path
   postgresql:
     persistence:
+      enabled: true
       storageClass: local-path
