@@ -6,8 +6,6 @@ define REQUIREMENTS
 |----------------|---------------------|---------------------------------------------------|
 |Charm Gum       |Yes                  |'https://github.com/charmbracelet/gum#installation'|
 |mkcert          |Yes                  |'https://github.com/FiloSottile/mkcert'            |
-|jq              |Yes                  |'https://stedolan.github.io/jq/download'           |
-|yq              |Yes                  |'https://github.com/mikefarah/yq#install'          |
 |kubectl         |Yes                  |'https://kubernetes.io/docs/tasks/tools/#kubectl'  |
 |helm            |Yes                  |'https://helm.sh/docs/intro/install/'              |
 
