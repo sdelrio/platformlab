@@ -44,7 +44,7 @@ gitea/token:  # https://docs.gitea.io/en-us/api-usage/#generating-and-listing-ap
 		curl -k -s \
 		-H "Content-Type: application/json" \
 		-X POST \
-		-d '{"name":"$(TOKEN_NAME)", "scopes":["sudo","admin:org"]}' \
+		-d '{"name":"$(TOKEN_NAME)", "scopes":["sudo","admin:org","write:repo_hook"]}' \
 		-u $(GITOPS_USER):$(GITOPS_PASS) \
 		$(GITEA_API)/users/$(GITOPS_USER)/tokens > $(TMP_TOKEN) \
 		|| echo "$(TMP_TOKEN) already existed"
@@ -88,7 +88,23 @@ gitea/remote:
 gitea/push: 
 	cd .. && git -c http.sslVerify=false push -u local master
 
-gitea/prepare: gitea/remote gitea/tokendelete gitea/token gitea/org gitea/repo gitea/push
+gitea/webhook:
+	@echo "Checking for already created argocd webhook on: $(GITOPS_REPO)"
+	@curl -sk -X GET "$(GITEA_API)/repos/$(GITOPS_ORG)/$(GITOPS_REPO)/hooks" \
+	-H 'accept: application/json' \
+	-H 'Content-Type: application/json' \
+	-H "Authorization: token $(shell cat $(TMP_TOKEN) | jq -r .sha1)" \
+	| grep -q argocd-server.argocd \
+	&& echo "Webhook was already created" \
+	|| ( echo "Creating gitea argocd webhook on: $(GITOPS_REPO)"; \
+	curl -k -X POST "$(GITEA_API)/repos/$(GITOPS_ORG)/$(GITOPS_REPO)/hooks" \
+		-H 'accept: application/json' \
+		-H 'Content-Type: application/json' \
+		-H "Authorization: token $(shell cat $(TMP_TOKEN) | jq -r .sha1)" \
+		--data '{ "type": "gitea", "active": true, "branch_filter": "master", "authorization_heder": "", "events": ["push"], "config": { "content_type":"json", "http_method":"post", "url":"http://argocd-server.argocd/api/webhook" } }'\
+		)
+
+gitea/prepare: gitea/remote gitea/tokendelete gitea/token gitea/org gitea/repo gitea/push gitea/webhook
 
 gitea/template:
 	@cd gitea && \
