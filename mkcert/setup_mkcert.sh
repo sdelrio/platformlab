@@ -37,7 +37,7 @@ mkcert \
   $MKCERT_DOMAIN "*.$MKCERT_DOMAIN" $MKCERT_EXTRA
 
 # If traefik installed (rancher-desktop)
-kubectl -n kube-system get deployment ztraefik 2>/dev/null >/dev/null
+kubectl -n kube-system get deployment traefik 2>/dev/null >/dev/null
 [ $? -eq 0 ] && traefikCert
 
 exit 0
