@@ -21,7 +21,7 @@ gitea/charts: gitea/Chart.yaml
 
 namespace:
 	@kubectl create namespace gitea --dry-run=client --output=yaml \
-		| kubectl apply -f - 
+		| kubectl apply -f -
 
 .PHONY: gitea
 gitea: namespace gitea/charts
@@ -32,7 +32,7 @@ gitea: namespace gitea/charts
 				--skip-tests \
         --namespace gitea \
         gitea . \
-				| kubectl -n gitea apply -f - 
+				| kubectl -n gitea apply -f -
 	@echo "[info] wait for gitea pods to be ready ..."
 	@kubectl wait pods -n gitea -l app=gitea --for condition=Ready --timeout=120s
 	@echo "[info] wait for gitea ingress $(GITEA_URL) to be ready ..."
@@ -75,7 +75,7 @@ gitea/repo:
 		-H 'accept: application/json' \
 		-H 'Content-Type: application/json' \
 		-H "Authorization: token $(shell cat $(TMP_TOKEN) | jq -r .sha1)" \
-		--data '{"name":"$(GITOPS_REPO)"}' 
+		--data '{"name":"$(GITOPS_REPO)"}'
 
 gitea/remote:
 	@if git remote -v | grep -q $(GITEA_DOMAIN); then \
@@ -85,7 +85,7 @@ gitea/remote:
 		cd .. && git remote add local https://$(GITOPS_USER):$(GITOPS_PASS)@$(GITEA_DOMAIN)/$(GITOPS_ORG)/$(GITOPS_REPO).git; \
 	fi
 
-gitea/push: 
+gitea/push:
 	cd .. && git -c http.sslVerify=false push -u local master
 
 gitea/webhook:
@@ -112,7 +112,7 @@ gitea/template:
         --include-crds \
 				--api-versions="networking.k8s.io/v1/Ingress" \
         --namespace gitea \
-        gitea . 
+        gitea .
 
 delete:
 	@cd gitea && \
