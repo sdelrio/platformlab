@@ -17,7 +17,7 @@ gitea:
     config:
       server:
         LANDING_PAGE: explore
-        ROOT_URL: https://git.127.0.0.1.nip.io
+        ROOT_URL: http://gitea-http.gitea:3000
       webhook:
         ALLOWED_HOST_LIST: private
 #  global:
